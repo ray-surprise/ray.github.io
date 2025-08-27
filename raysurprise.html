@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Feliz Aniversario, Ray!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #111827, #2d1847);
+            color: #fff;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            padding: 2rem;
+            max-width: 90%;
+            margin: auto;
+            border-radius: 1.5rem;
+            background: rgba(43, 23, 73, 0.4);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        /* Animación para el contenido principal */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Animación de estrellas de fondo */
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle 5s linear infinite;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.5); }
+        }
+
+        .star-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* Animación para los corazones flotantes */
+        .heart {
+            position: absolute;
+            bottom: -50px;
+            background: rgba(255, 20, 147, 0.7);
+            border-radius: 50%;
+            transform: rotate(-45deg);
+            opacity: 0;
+            animation: floatUp 10s ease-in infinite;
+        }
+        
+        .heart::before, .heart::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            border-radius: 50%;
+        }
+
+        .heart::before {
+            top: -50%;
+            left: 0;
+        }
+
+        .heart::after {
+            top: 0;
+            left: 50%;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(-45deg); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(-1000px) rotate(-45deg); opacity: 0; }
+        }
+
+        /* Estilo para el botón */
+        .special-button {
+            background-color: #ff1493;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            transition: transform 0.2s ease-in-out;
+        }
+        
+        .special-button:hover {
+            transform: scale(1.1);
+        }
+
+        /* Estilo para el mensaje oculto */
+        .hidden-message {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            opacity: 0;
+        }
+
+        .hidden-message.visible {
+            max-height: 500px; /* Suficiente para mostrar el mensaje */
+            opacity: 1;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Contenedor de estrellas de fondo animadas -->
+    <div class="star-container" id="star-container"></div>
+
+    <div class="container">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 animate-pulse">¡6 meses de amor contigo, Ray!</h1>
+        <p class="text-lg md:text-xl text-gray-300 mb-6">Desde el 28 de febrero de 2025 hasta hoy, 28 de agosto de 2025.</p>
+        
+        <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8 mb-6 text-2xl font-bold">
+            <div class="flex flex-col items-center">
+                <span id="days">0</span>
+                <span class="text-sm font-normal text-gray-400">Días</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <span id="hours">0</span>
+                <span class="text-sm font-normal text-gray-400">Horas</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <span id="minutes">0</span>
+                <span class="text-sm font-normal text-gray-400">Minutos</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <span id="seconds">0</span>
+                <span class="text-sm font-normal text-gray-400">Segundos</span>
+            </div>
+        </div>
+        
+        <button id="show-message-btn" class="special-button">
+            Haz clic para un mensaje especial
+        </button>
+
+        <div id="special-message" class="hidden-message">
+            <p class="mt-4 text-md md:text-lg italic text-gray-200">
+                No me quiero poner tan cursi (aunque lo soy), pero simplemente quiero que sepas que me has ayudado a salir de mucha mierda y te lo agradezco muchísimo. Nos hemos unido como en una romcom de anime (supongo que recordarás mucho esa frase, porque con eso estabas dando vueltas en la cama), y es que tal cual: esa conexión no fue normal desde el minuto 1. Estamos unidos y somos tal para cual: en lo romántico, en los problemas, en nuestras chorradas y locuras… en todo. Eres lo mítico que no sabía que necesitaba hasta que llegaste a mi vida, y la verdad es que me hacías mucha falta. Gracias por todo, y te amo muchísimo, mi amor… 💖
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Función para crear y animar las estrellas de fondo
+        function createStar() {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 3 + 1; // Tamaño entre 1px y 4px
+            star.style.width = star.style.height = `${size}px`;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 5}s`;
+            document.getElementById('star-container').appendChild(star);
+
+            setTimeout(() => {
+                star.remove();
+            }, 5000); // Eliminar la estrella después de su animación
+        }
+
+        // Crear estrellas continuamente
+        setInterval(createStar, 200);
+
+        // Función para crear y animar los corazones flotantes
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            const size = Math.random() * 20 + 20; // Tamaño entre 20px y 40px
+            heart.style.width = heart.style.height = `${size}px`;
+            heart.style.left = `${Math.random() * 100}%`;
+            heart.style.animationDelay = `${Math.random() * 5}s`;
+            document.body.appendChild(heart);
+
+            setTimeout(() => {
+                heart.remove();
+            }, 10000); // Eliminar el corazón después de su animación
+        }
+
+        // Crear corazones continuamente
+        setInterval(createHeart, 500);
+
+        // Lógica del contador de tiempo
+        const startDate = new Date('2025-02-28T00:00:00');
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+
+        function updateCountdown() {
+            const now = new Date();
+            const timePassed = now - startDate;
+
+            const seconds = Math.floor((timePassed / 1000) % 60);
+            const minutes = Math.floor((timePassed / 1000 / 60) % 60);
+            const hours = Math.floor((timePassed / (1000 * 60 * 60)) % 24);
+            const days = Math.floor(timePassed / (1000 * 60 * 60 * 24));
+
+            daysEl.textContent = days;
+            hoursEl.textContent = hours;
+            minutesEl.textContent = minutes;
+            secondsEl.textContent = seconds;
+        }
+
+        // Actualizar el contador cada segundo
+        setInterval(updateCountdown, 1000);
+        updateCountdown(); // Llamada inicial para evitar un retraso
+
+        // Lógica para mostrar el mensaje especial y reproducir el sonido
+        const showMessageBtn = document.getElementById('show-message-btn');
+        const specialMessageDiv = document.getElementById('special-message');
+        const popSynth = new Tone.Synth({
+            oscillator: { type: 'sine' },
+            envelope: {
+                attack: 0.001,
+                decay: 0.1,
+                sustain: 0,
+                release: 0.1,
+            },
+        }).toDestination();
+        
+        showMessageBtn.addEventListener('click', async () => {
+            // Reproducir el sonido
+            await Tone.start();
+            popSynth.triggerAttackRelease('C5', '8n');
+
+            // Mostrar el mensaje
+            specialMessageDiv.classList.toggle('visible');
+            if (specialMessageDiv.classList.contains('visible')) {
+                showMessageBtn.textContent = '¡Ya viste el mensaje!';
+            } else {
+                showMessageBtn.textContent = 'Haz clic para un mensaje especial';
+            }
+        });
+    </script>
+</body>
+</html>
